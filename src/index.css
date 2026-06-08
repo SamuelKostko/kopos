@@ -1,0 +1,194 @@
+/* =================================================================
+   index.css — Sistema de Diseño: Kopos Ice Cream
+   Paleta:
+   - Fondo: #F3E5D8 (Beige cálido — brand)
+   - Principal: #2B1F2D (Ciruela oscuro / Negro Kopos — brand)
+   
+   Corner radius system (LOCKED):
+   - Cards / sections: 1.5rem (24px)
+   - Buttons: 9999px (full pill)
+   - Inputs / small chips: 0.75rem (12px)
+   - Images inside cards: 1rem (16px)
+   ================================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter+Tight:ital,wght@0,400;0,500;0,600;0,700;1,700&display=swap");
+@import "tailwindcss";
+
+:root {
+  --bg-color: #F3E5D8;
+  --bg-color-darker: #E5D5C5;
+  --main-color: #2B1F2D;
+  --main-color-light: #3D2D40;
+  --white: #FFFFFF;
+  --whatsapp: #25D366;
+  --whatsapp-hover: #1EBD5A;
+
+  /* Spacing rhythm */
+  --section-py: clamp(5rem, 10vw, 8rem);
+}
+
+.custom-container {
+  max-width: 1024px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+  width: 100% !important;
+}
+
+.card-info-container {
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+  padding-top: 1rem !important;
+  padding-bottom: 1.5rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 0% !important;
+  gap: 1rem !important;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: "Inter Tight", system-ui, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--main-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Outfit", sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-color); }
+::-webkit-scrollbar-thumb {
+  background: rgba(43, 31, 45, 0.3);
+  border-radius: 4px;
+  border: 2px solid var(--bg-color);
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+:focus-visible {
+  outline: 2px solid var(--main-color);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ============================
+   BUTTON SYSTEM (pill-only)
+   ============================ */
+.btn-primary {
+  background-color: var(--main-color) !important;
+  color: var(--bg-color) !important;
+  padding: 0.875rem 2rem !important;
+  font-weight: 800 !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+  border-radius: 9999px !important;
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease !important;
+  box-shadow: 0 4px 14px rgba(43, 31, 45, 0.18) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  border: none !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+.btn-primary:hover {
+  background-color: var(--main-color-light) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(43, 31, 45, 0.22) !important;
+}
+.btn-primary:active { transform: translateY(1px) !important; }
+
+.btn-secondary {
+  background-color: transparent !important;
+  color: var(--main-color) !important;
+  border: 1.5px solid rgba(43, 31, 45, 0.35) !important;
+  padding: 0.875rem 2rem !important;
+  font-weight: 700 !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+  border-radius: 9999px !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+.btn-secondary:hover {
+  background-color: var(--main-color) !important;
+  color: var(--bg-color) !important;
+  border-color: var(--main-color) !important;
+  transform: translateY(-2px) !important;
+}
+.btn-secondary:active { transform: translateY(1px) !important; }
+
+.btn-card {
+  background-color: var(--main-color) !important;
+  color: var(--bg-color) !important;
+  padding: 0.625rem 1.5rem !important;
+  font-weight: 800 !important;
+  font-size: 0.7rem !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+  border-radius: 9999px !important;
+  transition: background-color 0.2s ease, transform 0.15s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem !important;
+  border: none !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+.btn-card:hover {
+  background-color: var(--main-color-light) !important;
+  transform: translateY(-1px) !important;
+}
+.btn-card:active { transform: translateY(1px) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Marquee animation — only runs when motion is OK */
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-track {
+    animation: marquee-scroll 28s linear infinite;
+  }
+  @keyframes marquee-scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+}
