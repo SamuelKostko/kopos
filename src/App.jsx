@@ -14,6 +14,8 @@ import { KitchenDashboard } from "./components/KitchenDashboard";
 import { Footer } from "./components/Footer";
 import { useCart } from "./hooks/useCart";
 import { ChefHat } from "@phosphor-icons/react";
+import { collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc, query, orderBy } from "firebase/firestore";
+import { db } from "./config/firebase";
 
 export default function App() {
   const { items, addItem, removeItem, removeItemCompletely, clearCart, totalItems, totalPrice } = useCart();
@@ -28,10 +30,7 @@ export default function App() {
   });
   
   // Kitchen Dashboard State
-  const [dineInOrders, setDineInOrders] = useState(() => {
-    const saved = localStorage.getItem("dineInOrders");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [dineInOrders, setDineInOrders] = useState([]);
 
   // Listen to popstate changes (history back/forward)
   useEffect(() => {
@@ -46,49 +45,52 @@ export default function App() {
     return () => window.removeEventListener("popstate", handleLocationChange);
   }, []);
 
-  // Sync dine-in orders to localStorage
+  // Sync dine-in orders from Firestore
   useEffect(() => {
-    localStorage.setItem("dineInOrders", JSON.stringify(dineInOrders));
-  }, [dineInOrders]);
+    const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const ordersData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setDineInOrders(ordersData);
+    });
 
-  // Sincronizar cambios entre pestañas automáticamente (para la vista /admin)
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === "dineInOrders") {
-        try {
-          const updatedOrders = e.newValue ? JSON.parse(e.newValue) : [];
-          setDineInOrders(updatedOrders);
-        } catch (error) {
-          console.error("Error parsing orders from storage:", error);
-        }
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
+    return () => unsubscribe();
   }, []);
 
-  const handleDineInOrder = (orderDetails) => {
-    const newOrder = {
-      id: orderDetails.id,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      customer: orderDetails.name,
-      table: orderDetails.table,
-      items: orderDetails.items,
-      totalPrice: orderDetails.totalPrice,
-      status: "Pendiente" // "Pendiente" | "Preparando" | "Entregado"
-    };
-    setDineInOrders((prev) => [newOrder, ...prev]);
+  const handleDineInOrder = async (orderDetails) => {
+    try {
+      const newOrder = {
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        createdAt: Date.now(),
+        customer: orderDetails.name,
+        table: orderDetails.table,
+        items: orderDetails.items,
+        totalPrice: orderDetails.totalPrice,
+        status: "Pendiente" // "Pendiente" | "Preparando" | "Entregado"
+      };
+      await setDoc(doc(db, "orders", orderDetails.id), newOrder);
+    } catch (error) {
+      console.error("Error creating order: ", error);
+    }
   };
 
-  const handleUpdateOrderStatus = (orderId, nextStatus) => {
-    setDineInOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status: nextStatus } : o))
-    );
+  const handleUpdateOrderStatus = async (orderId, nextStatus) => {
+    try {
+      const orderRef = doc(db, "orders", orderId);
+      await updateDoc(orderRef, { status: nextStatus });
+    } catch (error) {
+      console.error("Error updating order status: ", error);
+    }
   };
 
-  const handleDeleteOrder = (orderId) => {
-    setDineInOrders((prev) => prev.filter((o) => o.id !== orderId));
+  const handleDeleteOrder = async (orderId) => {
+    try {
+      await deleteDoc(doc(db, "orders", orderId));
+    } catch (error) {
+      console.error("Error deleting order: ", error);
+    }
   };
 
   // If visiting /admin route, render ONLY the full-screen Kitchen Dashboard
