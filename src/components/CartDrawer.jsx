@@ -10,12 +10,14 @@ import { buildWhatsAppUrl } from "../utils/whatsapp";
 
 export function CartDrawer({ isOpen, onClose, items, totalItems, totalPrice, onAdd, onRemove, onRemoveCompletely, onClear, onDineInOrder }) {
   const reduce = useReducedMotion();
-  const whatsappUrl = buildWhatsAppUrl(items, totalPrice);
 
-  // Checkout Stepper State: "cart" | "method" | "tableInput" | "success"
+  // Checkout Stepper State: "cart" | "method" | "tableInput" | "deliveryInput" | "success"
   const [checkoutStep, setCheckoutStep] = useState("cart");
   const [customerName, setCustomerName] = useState("");
   const [tableNumber, setTableNumber] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("Pago Móvil");
   const [lastOrderId, setLastOrderId] = useState("");
 
   // Reset stepper on drawer close or open
@@ -26,17 +28,46 @@ export function CartDrawer({ isOpen, onClose, items, totalItems, totalPrice, onA
         setCheckoutStep("cart");
         setCustomerName("");
         setTableNumber("");
+        setPhone("");
+        setAddress("");
+        setPaymentMethod("Pago Móvil");
       }, 300);
       return () => clearTimeout(t);
     }
   }, [isOpen]);
 
-  const handleDeliveryCheckout = () => {
-    // Open WhatsApp
-    window.open(whatsappUrl, "_blank");
-    // Clear cart and close
+  const handleDeliverySubmit = (e) => {
+    e.preventDefault();
+    if (!customerName.trim() || !address.trim() || !phone.trim()) return;
+
+    const orderId = "KOP-" + Math.floor(1000 + Math.random() * 9000);
+    setLastOrderId(orderId);
+
+    const deliveryDetails = {
+      name: customerName.trim(),
+      phone: phone.trim(),
+      address: address.trim(),
+      paymentMethod
+    };
+
+    // Save order in Firebase with type: "delivery"
+    onDineInOrder({
+      id: orderId,
+      name: customerName.trim(),
+      table: "Delivery",
+      items: [...items],
+      totalPrice,
+      type: "delivery",
+      phone: phone.trim(),
+      address: address.trim(),
+      paymentMethod
+    });
+
+    const customWhatsappUrl = buildWhatsAppUrl(items, totalPrice, deliveryDetails);
+    window.open(customWhatsappUrl, "_blank");
+
+    setCheckoutStep("success");
     onClear();
-    onClose();
   };
 
   const handleDineInSubmit = (e) => {
@@ -98,7 +129,7 @@ export function CartDrawer({ isOpen, onClose, items, totalItems, totalPrice, onA
                 <div className="flex items-center gap-2">
                   {checkoutStep !== "cart" && checkoutStep !== "success" && (
                     <button
-                      onClick={() => setCheckoutStep(checkoutStep === "tableInput" ? "method" : "cart")}
+                      onClick={() => setCheckoutStep((checkoutStep === "tableInput" || checkoutStep === "deliveryInput") ? "method" : "cart")}
                       aria-label="Regresar"
                       className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#2B1F2D]/5 text-[#2B1F2D] mr-1"
                     >
@@ -110,6 +141,7 @@ export function CartDrawer({ isOpen, onClose, items, totalItems, totalPrice, onA
                       {checkoutStep === "cart" && "Tu pedido"}
                       {checkoutStep === "method" && "¿Cómo deseas tu helado?"}
                       {checkoutStep === "tableInput" && "Tu Nombre"}
+                      {checkoutStep === "deliveryInput" && "Datos de Entrega"}
                       {checkoutStep === "success" && "¡Pedido Recibido!"}
                     </h2>
                     {checkoutStep === "cart" && totalItems > 0 && (
@@ -262,7 +294,7 @@ export function CartDrawer({ isOpen, onClose, items, totalItems, totalPrice, onA
 
                       {/* Opción Delivery */}
                       <button
-                        onClick={handleDeliveryCheckout}
+                        onClick={() => setCheckoutStep("deliveryInput")}
                         className="flex items-center gap-4 sm:gap-5 p-5 sm:p-7 rounded-[24px] sm:rounded-[28px] bg-white hover:border-[#25D366] text-left shadow-sm hover:shadow-md transition-all group cursor-pointer"
                         style={{ border: "2px solid rgba(43, 31, 45, 0.05)" }}
                       >
@@ -315,6 +347,86 @@ export function CartDrawer({ isOpen, onClose, items, totalItems, totalPrice, onA
                   </form>
                 )}
 
+                {/* PASO 3b: DETALLES DE DELIVERY */}
+                {checkoutStep === "deliveryInput" && (
+                  <form onSubmit={handleDeliverySubmit} className="flex-1 flex flex-col justify-between py-2 min-h-[300px] gap-4">
+                    <div className="space-y-3.5">
+                      <p className="text-xs font-semibold opacity-70 leading-relaxed">
+                        Completa tus datos para coordinar el envío de tus helados Kopos:
+                      </p>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label htmlFor="cust-name-del" className="text-[10px] font-bold uppercase tracking-wider text-[var(--main-color)] opacity-60">
+                          Tu Nombre *
+                        </label>
+                        <input
+                          id="cust-name-del"
+                          type="text"
+                          required
+                          placeholder="Ej: Alejandro"
+                          value={customerName}
+                          onChange={(e) => setCustomerName(e.target.value)}
+                          className="w-full bg-white border-2 border-[#2B1F2D]/10 focus:border-[var(--main-color)] rounded-xl px-4 py-2.5 text-sm font-semibold outline-none transition-all"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label htmlFor="cust-phone" className="text-[10px] font-bold uppercase tracking-wider text-[var(--main-color)] opacity-60">
+                          Teléfono de Contacto *
+                        </label>
+                        <input
+                          id="cust-phone"
+                          type="tel"
+                          required
+                          placeholder="Ej: +58 412 1234567"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          className="w-full bg-white border-2 border-[#2B1F2D]/10 focus:border-[var(--main-color)] rounded-xl px-4 py-2.5 text-sm font-semibold outline-none transition-all"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label htmlFor="cust-address" className="text-[10px] font-bold uppercase tracking-wider text-[var(--main-color)] opacity-60">
+                          Dirección de Entrega *
+                        </label>
+                        <textarea
+                          id="cust-address"
+                          required
+                          rows="2"
+                          placeholder="Ej: Av. Principal, Res. El Sol, Apto 5B, Caracas"
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
+                          className="w-full bg-white border-2 border-[#2B1F2D]/10 focus:border-[var(--main-color)] rounded-xl px-4 py-2.5 text-sm font-semibold outline-none transition-all resize-none"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label htmlFor="payment-method" className="text-[10px] font-bold uppercase tracking-wider text-[var(--main-color)] opacity-60">
+                          Método de Pago
+                        </label>
+                        <select
+                          id="payment-method"
+                          value={paymentMethod}
+                          onChange={(e) => setPaymentMethod(e.target.value)}
+                          className="w-full bg-white border-2 border-[#2B1F2D]/10 focus:border-[var(--main-color)] rounded-xl px-4 py-2.5 text-sm font-semibold outline-none transition-all"
+                        >
+                          <option value="Pago Móvil">Pago Móvil</option>
+                          <option value="Efectivo">Efectivo</option>
+                          <option value="Zelle">Zelle / Transferencia</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="btn-primary w-full !text-xs !py-3.5 shadow-md hover:scale-[1.02] mt-4 transition-all cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      <WhatsappLogo size={18} weight="fill" />
+                      Enviar Pedido por WhatsApp
+                    </button>
+                  </form>
+                )}
+
                 {/* PASO 4: ÉXITO */}
                 {checkoutStep === "success" && (
                   <div className="flex-1 flex flex-col items-center justify-center text-center py-8 px-4 my-auto">
@@ -328,13 +440,13 @@ export function CartDrawer({ isOpen, onClose, items, totalItems, totalPrice, onA
                     </motion.div>
                     
                     <h3 className="text-lg sm:text-xl font-black mb-1" style={{ color: "var(--main-color)", fontFamily: "Outfit" }}>
-                      ¡Pedido enviado a cocina!
+                      ¡Pedido enviado!
                     </h3>
                     <p className="text-xs sm:text-sm font-bold text-green-600 uppercase tracking-widest mb-3">
                       Orden: {lastOrderId}
                     </p>
                     <p className="text-xs font-semibold leading-relaxed max-w-[280px] mb-6 opacity-70">
-                      Hemos recibido tu pedido en el taller. En breve lo prepararemos y lo serviremos directamente en tu mesa. ¡Disfruta!
+                      Hemos recibido tu pedido en nuestro panel de cocina y también se abrirá WhatsApp para coordinar el envío. ¡Disfruta!
                     </p>
 
                     <button

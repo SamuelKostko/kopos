@@ -4,7 +4,8 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Check, ChefHat, BellRinging, Trash, Archive, Clock, CookingPot, CheckCircle, ClockCounterClockwise } from "@phosphor-icons/react";
+import { X, Check, ChefHat, BellRinging, Trash, Archive, Clock, CookingPot, CheckCircle, ClockCounterClockwise, WhatsappLogo } from "@phosphor-icons/react";
+
 
 export function KitchenDashboard({ isOpen, onClose, orders, onUpdateStatus, onDeleteOrder, isFullScreen }) {
   const previousOrdersCount = useRef(orders.length);
@@ -50,11 +51,25 @@ export function KitchenDashboard({ isOpen, onClose, orders, onUpdateStatus, onDe
     }
   };
 
-  // Grouping orders for Kanban
-  const pendingOrders = orders.filter(o => o.status === "Pendiente");
-  const preparingOrders = orders.filter(o => o.status === "Preparando");
-  const readyOrders = orders.filter(o => o.status === "Entregado"); 
-  const archivedOrders = orders.filter(o => o.status === "Archivado"); // NEW
+  const [activeTab, setActiveTab] = useState("dine-in"); // "dine-in" | "delivery"
+
+  // Grouping orders for Kanban based on active tab
+  const activeOrders = orders.filter(o => {
+    if (activeTab === "delivery") {
+      return o.type === "delivery";
+    } else {
+      return o.type !== "delivery"; // default to salon
+    }
+  });
+
+  const pendingOrders = activeOrders.filter(o => o.status === "Pendiente");
+  const preparingOrders = activeOrders.filter(o => o.status === "Preparando");
+  const readyOrders = activeOrders.filter(o => o.status === "Entregado"); 
+  const archivedOrders = orders.filter(o => o.status === "Archivado"); // shows all history
+
+  // Order counts for badges in tabs
+  const dineInCount = orders.filter(o => o.status !== "Archivado" && o.type !== "delivery").length;
+  const deliveryCount = orders.filter(o => o.status !== "Archivado" && o.type === "delivery").length;
 
   // Reusable Order Card Component
   const OrderCard = ({ order, isSidebar = false, isHistory = false }) => {
@@ -86,15 +101,56 @@ export function KitchenDashboard({ isOpen, onClose, orders, onUpdateStatus, onDe
                   {dateStr} {order.timestamp}
                 </span>
               )}
+              {isHistory && (
+                <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider ${
+                  order.type === "delivery" ? "bg-emerald-50 text-emerald-600" : "bg-indigo-50 text-indigo-600"
+                }`}>
+                  {order.type === "delivery" ? "Delivery 🛵" : "Salón 🧑‍🍳"}
+                </span>
+              )}
             </div>
             <h4 className="text-lg font-bold text-slate-800 leading-tight mt-0.5" style={{ fontFamily: "Outfit" }}>
               {order.customer}
             </h4>
           </div>
-          <div className="bg-slate-50 text-slate-500 text-xs font-bold px-2.5 py-1 rounded-md">
-            Mesa {order.table || "—"}
-          </div>
+          {order.type === "delivery" ? (
+            <div className="bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md flex items-center gap-1 flex-shrink-0">
+              <span>🛵 Delivery</span>
+            </div>
+          ) : (
+            <div className="bg-slate-50 text-slate-500 text-xs font-bold px-2.5 py-1 rounded-md flex-shrink-0">
+              Mesa {order.table || "—"}
+            </div>
+          )}
         </div>
+
+        {/* Delivery Details Section */}
+        {order.type === "delivery" && (
+          <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-xs space-y-1.5 text-slate-600">
+            {order.phone && (
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold text-slate-400">📞 Tel:</span>
+                <a href={`tel:${order.phone}`} className="text-indigo-600 font-semibold hover:underline">
+                  {order.phone}
+                </a>
+              </div>
+            )}
+            {order.address && (
+              <div className="flex items-start gap-1.5">
+                <span className="font-bold text-slate-400 flex-shrink-0">📍 Dir:</span>
+                <span className="leading-tight font-medium">{order.address}</span>
+              </div>
+            )}
+            {order.paymentMethod && (
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold text-slate-400">💳 Pago:</span>
+                <span className="font-semibold bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded text-[10px]">
+                  {order.paymentMethod}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="bg-slate-50/50 rounded-xl p-3 space-y-2.5">
           {order.items.map((it, idx) => (
@@ -225,7 +281,7 @@ export function KitchenDashboard({ isOpen, onClose, orders, onUpdateStatus, onDe
     return (
       <div className="w-full min-h-screen flex flex-col bg-slate-50 font-sans">
         {/* Header - Glassmorphism */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 sm:py-5 border-b border-slate-200/60 bg-white/70 backdrop-blur-xl sticky top-0 z-10 gap-4 sm:gap-0">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between px-6 py-4 lg:py-5 border-b border-slate-200/60 bg-white/70 backdrop-blur-xl sticky top-0 z-10 gap-4 lg:gap-0">
           <div className="flex items-center gap-3.5">
             <div className="w-11 h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-sm">
               <ChefHat size={24} weight="fill" />
@@ -245,7 +301,48 @@ export function KitchenDashboard({ isOpen, onClose, orders, onUpdateStatus, onDe
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+
+          {/* Tab Switcher: Salón vs Delivery */}
+          <div className="flex p-1 bg-slate-100 rounded-xl border border-slate-200/40 w-full sm:w-auto">
+            <button
+              onClick={() => setActiveTab("dine-in")}
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+                activeTab === "dine-in"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-500 hover:text-slate-900"
+              }`}
+            >
+              <CookingPot size={15} weight="fill" />
+              <span>Salón (Mesa)</span>
+              {dineInCount > 0 && (
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
+                  activeTab === "dine-in" ? "bg-indigo-600 text-white" : "bg-slate-200 text-slate-600"
+                }`}>
+                  {dineInCount}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab("delivery")}
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+                activeTab === "delivery"
+                  ? "bg-white text-emerald-600 shadow-sm"
+                  : "text-slate-500 hover:text-emerald-600"
+              }`}
+            >
+              <WhatsappLogo size={15} weight="fill" />
+              <span>Delivery / WhatsApp</span>
+              {deliveryCount > 0 && (
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
+                  activeTab === "delivery" ? "bg-emerald-600 text-white" : "bg-slate-200 text-slate-600"
+                }`}>
+                  {deliveryCount}
+                </span>
+              )}
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3 w-full lg:w-auto justify-end">
             <button
               onClick={() => setShowHistory(true)}
               className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 text-sm font-bold hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 shadow-sm flex items-center gap-2"
@@ -280,7 +377,7 @@ export function KitchenDashboard({ isOpen, onClose, orders, onUpdateStatus, onDe
                   {pendingOrders.map(order => <OrderCard key={order.id} order={order} />)}
                   {pendingOrders.length === 0 && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-32 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 text-sm font-medium">
-                      Sin nuevos pedidos
+                      {activeTab === "delivery" ? "Sin deliveries nuevos" : "Sin nuevos pedidos"}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -313,7 +410,7 @@ export function KitchenDashboard({ isOpen, onClose, orders, onUpdateStatus, onDe
               <div className="flex items-center justify-between mb-4 px-1">
                 <h3 className="text-sm font-bold text-emerald-600 flex items-center gap-2" style={{ fontFamily: "Outfit" }}>
                   <CheckCircle size={18} />
-                  Listos
+                  {activeTab === "delivery" ? "Listos / Despachados" : "Listos"}
                 </h3>
                 <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2.5 py-0.5 rounded-full">{readyOrders.length}</span>
               </div>
@@ -322,7 +419,7 @@ export function KitchenDashboard({ isOpen, onClose, orders, onUpdateStatus, onDe
                   {readyOrders.map(order => <OrderCard key={order.id} order={order} />)}
                   {readyOrders.length === 0 && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-32 border-2 border-dashed border-emerald-200/50 rounded-2xl flex items-center justify-center text-emerald-400/80 text-sm font-medium">
-                      Todos entregados
+                      {activeTab === "delivery" ? "Todos despachados" : "Todos entregados"}
                     </motion.div>
                   )}
                 </AnimatePresence>

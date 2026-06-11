@@ -68,7 +68,11 @@ export default function App() {
         table: orderDetails.table,
         items: orderDetails.items,
         totalPrice: orderDetails.totalPrice,
-        status: "Pendiente" // "Pendiente" | "Preparando" | "Entregado"
+        status: "Pendiente", // "Pendiente" | "Preparando" | "Entregado"
+        type: orderDetails.type || "dine-in",
+        phone: orderDetails.phone || "",
+        address: orderDetails.address || "",
+        paymentMethod: orderDetails.paymentMethod || ""
       };
       await setDoc(doc(db, "orders", orderDetails.id), newOrder);
     } catch (error) {

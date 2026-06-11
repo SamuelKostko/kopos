@@ -39,7 +39,7 @@ export const shopConfig = {
   // Ejemplo para Colombia:  "57300XXXXXXX"
   // NO incluyas el signo + ni espacios.
   // ---------------------------------------------------------------
-  whatsappNumber: "58412XXXXXXX",
+  whatsappNumber: "584125531883",
   whatsappGreeting:
     "Hola! Vi su catálogo en línea y me gustaría hacer el siguiente pedido:\n\n",
 
