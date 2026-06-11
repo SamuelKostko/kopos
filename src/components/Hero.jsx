@@ -86,13 +86,14 @@ export function Hero() {
                 Pedir por WhatsApp
               </MagneticButton>
             </motion.div>
+            <br />
 
             {/* 4. Schedule — small pills, visually separated */}
             <motion.div
               {...fadeUp(0.32)}
               className="flex flex-wrap gap-2 mt-8 pt-6"
               style={{ borderTop: "1px solid rgba(43, 31, 45, 0.09)" }}
-            >
+            > 
               {shopConfig.schedule.map((s) => (
                 <div
                   key={s.days}

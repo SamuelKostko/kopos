@@ -28,7 +28,7 @@
 }
 
 .custom-container {
-  max-width: 1024px !important;
+  max-width: 1200px !important;
   margin-left: auto !important;
   margin-right: auto !important;
   padding-left: 1.5rem !important;
@@ -182,13 +182,12 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* Marquee animation — only runs when motion is OK */
-@media (prefers-reduced-motion: no-preference) {
-  .marquee-track {
-    animation: marquee-scroll 28s linear infinite;
-  }
-  @keyframes marquee-scroll {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
+/* Marquee animation */
+.marquee-track {
+  animation: marquee-scroll-right 180s linear infinite;
+  will-change: transform;
+}
+@keyframes marquee-scroll-right {
+  0%   { transform: translate3d(-50%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
 }

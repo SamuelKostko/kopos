@@ -8,12 +8,16 @@
  *
  * NOTA: Ajusta los precios en cada producto segun tus precios reales.
  */
-import conoFresa      from "../assets/images/cono-fresa.png";
-import conoCookies    from "../assets/images/cono-cookies.png";
-import tinaChocolate  from "../assets/images/tina-chocolate.png";
-import tinaVainilla   from "../assets/images/tina-vainilla.png";
-import paletaMango    from "../assets/images/paleta-mango.png";
-import premiumMaracuya from "../assets/images/premium-maracuya.png";
+import gelatoRaffaello from "../assets/images/gelato_raffaello.png";
+import gelatoNutella from "../assets/images/gelato_nutella.png";
+import marquesaChocolate from "../assets/images/marquesa_chocolate.png";
+import chocolateIntenso from "../assets/images/chocolate_intenso.png";
+import chocoarancia from "../assets/images/chocoarancia.png";
+import cheesecakeFrutosRojos from "../assets/images/cheesecake_frutos_rojos.png";
+import pavlovaGelato from "../assets/images/pavlova_gelato.png";
+import mantecadoTradicional from "../assets/images/mantecado_tradicional.png";
+import pieLimon from "../assets/images/pie_limon.png";
+import pistachoGelato from "../assets/images/pistacho_gelato.png";
 
 export const products = [
   // ==================== CHOCOLATE ====================
@@ -22,9 +26,8 @@ export const products = [
     name: "Gelato Raffaello",
     description: "Gelato suave de chocolate blanco con coco y almendras.",
     category: "Chocolate",
-    image: tinaVainilla,
+    image: gelatoRaffaello,
     available: true,
-    badge: "Popular",
     prices: { barquilla: 2.00, tinitaS: 3.50, tinitaL: 6.00 },
   },
   {
@@ -32,9 +35,8 @@ export const products = [
     name: "Gelato Nutella",
     description: "Crema de chocolate con avellanas en una base de chocolate gelato.",
     category: "Chocolate",
-    image: tinaChocolate,
+    image: gelatoNutella,
     available: true,
-    badge: "Top",
     prices: { barquilla: 2.00, tinitaS: 3.50, tinitaL: 6.00 },
   },
   {
@@ -42,9 +44,8 @@ export const products = [
     name: "Marquesa de Chocolate",
     description: "Delicioso gelato inspirado en la tradicional marquesa. Bajo pedido.",
     category: "Chocolate",
-    image: conoCookies,
+    image: marquesaChocolate,
     available: true,
-    badge: "Bajo Pedido",
     prices: { barquilla: 2.00, tinitaS: 3.50, tinitaL: 6.00 },
   },
   {
@@ -52,9 +53,8 @@ export const products = [
     name: "Chocolate Intenso",
     description: "Gelato puro de cacao oscuro intenso para los verdaderos amantes del chocolate.",
     category: "Chocolate",
-    image: tinaChocolate,
+    image: chocolateIntenso,
     available: true,
-    badge: null,
     prices: { barquilla: 2.00, tinitaS: 3.50, tinitaL: 6.00 },
   },
   {
@@ -62,9 +62,8 @@ export const products = [
     name: "Chocoarancia (Naranja)",
     description: "Fusion de chocolate base gelato con toques aromaticos de naranja.",
     category: "Chocolate",
-    image: tinaChocolate,
+    image: chocoarancia,
     available: true,
-    badge: null,
     prices: { barquilla: 2.00, tinitaS: 3.50, tinitaL: 6.00 },
   },
 
@@ -74,9 +73,8 @@ export const products = [
     name: "Cheesecake Frutos Rojos",
     description: "Base de crema gelato con trozos de galleta y sirope de frutos rojos.",
     category: "Crema",
-    image: conoFresa,
+    image: cheesecakeFrutosRojos,
     available: true,
-    badge: "Top",
     prices: { barquilla: 2.00, tinitaS: 3.50, tinitaL: 6.00 },
   },
   {
@@ -84,9 +82,8 @@ export const products = [
     name: "Pavlova Gelato",
     description: "Crema base gelato con merengues crujientes y frutos del bosque.",
     category: "Crema",
-    image: tinaVainilla,
+    image: pavlovaGelato,
     available: true,
-    badge: null,
     prices: { barquilla: 2.00, tinitaS: 3.50, tinitaL: 6.00 },
   },
   {
@@ -94,9 +91,8 @@ export const products = [
     name: "Mantecado Tradicional",
     description: "Clasico y cremoso gelato de mantecado elaborado artesanalmente.",
     category: "Crema",
-    image: tinaVainilla,
+    image: mantecadoTradicional,
     available: true,
-    badge: null,
     prices: { barquilla: 2.00, tinitaS: 3.50, tinitaL: 6.00 },
   },
   {
@@ -104,9 +100,8 @@ export const products = [
     name: "Pie de Limon",
     description: "Crema de limon citrica con trozos de galleta crujiente y merengue.",
     category: "Crema",
-    image: premiumMaracuya,
+    image: pieLimon,
     available: true,
-    badge: null,
     prices: { barquilla: 2.00, tinitaS: 3.50, tinitaL: 6.00 },
   },
   {
@@ -114,177 +109,10 @@ export const products = [
     name: "Pistacho Gelato",
     description: "Cremoso gelato preparado con pistachos puros seleccionados.",
     category: "Crema",
-    image: paletaMango,
+    image: pistachoGelato,
     available: true,
-    badge: "Premium",
     prices: { barquilla: 2.50, tinitaS: 4.50, tinitaL: 8.00 },
-  },
-  {
-    id: "crema-pirulin",
-    name: "Gelato de Pirulin",
-    description: "Crema base gelato mezclada con trozos crujientes de Pirulin.",
-    category: "Crema",
-    image: conoCookies,
-    available: true,
-    badge: "Top",
-    prices: { barquilla: 2.50, tinitaS: 4.50, tinitaL: 8.00 },
-  },
-  {
-    id: "crema-ron-pasas",
-    name: "Ron con Pasas",
-    description: "Exquisito gelato de crema con pasas maceradas en ron premium.",
-    category: "Crema",
-    image: tinaVainilla,
-    available: true,
-    badge: null,
-    prices: { barquilla: 2.00, tinitaS: 3.50, tinitaL: 6.00 },
-  },
-
-  // ==================== PERNIGOTTI ====================
-  {
-    id: "pern-kinder-bueno",
-    name: "Kinder Bueno Pernigotti",
-    description: "Exclusivo gelato de crema sabor Kinder Bueno elaborado con base Pernigotti.",
-    category: "Pernigotti",
-    image: conoCookies,
-    available: true,
-    badge: "Premium",
-    prices: { barquilla: 3.00, tinitaS: 5.00, tinitaL: 9.00 },
-  },
-  {
-    id: "pern-milky-way",
-    name: "Milky Way Pernigotti",
-    description: "Gelato cremoso de chocolate, nougat y caramelo liquido.",
-    category: "Pernigotti",
-    image: tinaChocolate,
-    available: true,
-    badge: "Nuevo",
-    prices: { barquilla: 3.00, tinitaS: 5.00, tinitaL: 9.00 },
-  },
-  {
-    id: "pern-cookies-caramel",
-    name: "Cookies Caramel",
-    description: "Crema Pernigotti combinada con galleta y caramelo crujiente.",
-    category: "Pernigotti",
-    image: conoCookies,
-    available: true,
-    badge: null,
-    prices: { barquilla: 2.50, tinitaS: 4.50, tinitaL: 8.00 },
-  },
-  {
-    id: "pern-yogurt-frutos",
-    name: "Yogurt Frutos del Bosque",
-    description: "Fresco y ligero yogurt Pernigotti con veteado de frutos del bosque.",
-    category: "Pernigotti",
-    image: conoFresa,
-    available: true,
-    badge: null,
-    prices: { barquilla: 2.50, tinitaS: 4.50, tinitaL: 8.00 },
-  },
-  {
-    id: "pern-pistacho",
-    name: "Pistacho Pernigotti",
-    description: "La maxima expresion del gelato de pistacho elaborado con pasta Pernigotti.",
-    category: "Pernigotti",
-    image: paletaMango,
-    available: true,
-    badge: "Top Premium",
-    prices: { barquilla: 3.50, tinitaS: 6.00, tinitaL: 11.00 },
-  },
-
-  // ==================== SORBETE ====================
-  {
-    id: "sorb-guanabana",
-    name: "Sorbete de Guanabana",
-    description: "Sorbete refrescante hecho con 100% pulpa natural de guanabana.",
-    category: "Sorbete",
-    image: tinaVainilla,
-    available: true,
-    badge: null,
-    prices: { barquilla: 2.00, tinitaS: 3.50, tinitaL: 6.00 },
-  },
-  {
-    id: "sorb-fresa",
-    name: "Sorbete de Fresa",
-    description: "Fresa natural triturada y congelada para un sabor frutal intenso.",
-    category: "Sorbete",
-    image: conoFresa,
-    available: true,
-    badge: "Popular",
-    prices: { barquilla: 1.50, tinitaS: 2.50, tinitaL: 4.50 },
-  },
-  {
-    id: "sorb-limonada-coco",
-    name: "Limonada de Coco Pernigotti",
-    description: "Sorbete tropical cremoso de limon con leche de coco Pernigotti.",
-    category: "Sorbete",
-    image: premiumMaracuya,
-    available: true,
-    badge: "Top",
-    prices: { barquilla: 2.00, tinitaS: 3.50, tinitaL: 6.00 },
-  },
-  {
-    id: "sorb-mango",
-    name: "Sorbete de Mango",
-    description: "Mango fresco de temporada batido. Sujeto a disponibilidad.",
-    category: "Sorbete",
-    image: paletaMango,
-    available: true,
-    badge: "Temporada",
-    prices: { barquilla: 1.50, tinitaS: 2.50, tinitaL: 4.50 },
-  },
-  {
-    id: "sorb-parchita",
-    name: "Sorbete de Parchita",
-    description: "El clasico sabor tropical de maracuya en un sorbete citrico refrescante.",
-    category: "Sorbete",
-    image: premiumMaracuya,
-    available: true,
-    badge: null,
-    prices: { barquilla: 1.50, tinitaS: 2.50, tinitaL: 4.50 },
-  },
-
-  // ==================== SIN AZUCAR ====================
-  {
-    id: "sa-pistacho",
-    name: "Pistacho Sin Azucar",
-    description: "Disfruta de todo el sabor premium del gelato de pistacho sin azucar.",
-    category: "Sin Azucar",
-    image: paletaMango,
-    available: true,
-    badge: "Linea Fit",
-    prices: { barquilla: 2.50, tinitaS: 4.50, tinitaL: 8.00 },
-  },
-  {
-    id: "sa-coco",
-    name: "Coco Sin Azucar",
-    description: "Gelato cremoso de coco natural, endulzado de manera saludable.",
-    category: "Sin Azucar",
-    image: tinaVainilla,
-    available: true,
-    badge: null,
-    prices: { barquilla: 2.00, tinitaS: 3.50, tinitaL: 6.00 },
-  },
-  {
-    id: "sa-pie-limon",
-    name: "Pie de Limon Sin Azucar",
-    description: "La version ligera de nuestro pie de limon artesanal.",
-    category: "Sin Azucar",
-    image: premiumMaracuya,
-    available: true,
-    badge: null,
-    prices: { barquilla: 2.00, tinitaS: 3.50, tinitaL: 6.00 },
-  },
-  {
-    id: "sa-chocolate",
-    name: "Chocolate Sin Azucar",
-    description: "Gelato de chocolate artesanal bajo en calorias sin azucares anadidos.",
-    category: "Sin Azucar",
-    image: tinaChocolate,
-    available: true,
-    badge: null,
-    prices: { barquilla: 2.00, tinitaS: 3.50, tinitaL: 6.00 },
   },
 ];
 
-export const categories = ["Todos", "Chocolate", "Crema", "Pernigotti", "Sorbete", "Sin Azucar"];
+export const categories = ["Todos", "Chocolate", "Crema"];

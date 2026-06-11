@@ -4,13 +4,11 @@
  * MOTION_INTENSITY:6 — useScroll + useTransform + useMotionTemplate only.
  * No window.addEventListener('scroll') — banned per skill §5.D / §7.
  */
-import { useState } from "react";
 import { motion, AnimatePresence, useScroll, useTransform, useMotionTemplate } from "motion/react";
 import { List, X, ShoppingCart } from "@phosphor-icons/react";
 import { shopConfig, logoNavbar } from "../config/shopConfig";
 
 export function Navbar({ totalItems, onCartClick }) {
-  const [menuOpen, setMenuOpen] = useState(false);
 
   // All reactive values driven by scroll — no useState, no re-renders
   const { scrollY } = useScroll();
@@ -26,7 +24,6 @@ export function Navbar({ totalItems, onCartClick }) {
 
   const scrollTo = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    setMenuOpen(false);
   };
 
   const navLinks = [
@@ -121,75 +118,12 @@ export function Navbar({ totalItems, onCartClick }) {
               </AnimatePresence>
             </motion.button>
 
-            <button
-              className="md:hidden p-2 focus-visible:outline-none"
-              style={{ color: "var(--main-color)" }}
-              onClick={() => setMenuOpen((p) => !p)}
-              aria-label={menuOpen ? "Cerrar menu" : "Abrir menu"}
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.span
-                  key={menuOpen ? "close" : "open"}
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.18 }}
-                >
-                  {menuOpen ? <X size={26} weight="bold" /> : <List size={26} weight="bold" />}
-                </motion.span>
-              </AnimatePresence>
-            </button>
+            {/* Mobile menu removed per request */}
           </div>
         </div>
       </motion.header>
 
-      {/* Mobile fullscreen menu */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            initial={{ clipPath: "inset(0 0 100% 0)" }}
-            animate={{ clipPath: "inset(0 0 0% 0)" }}
-            exit={{ clipPath: "inset(0 0 100% 0)" }}
-            transition={{ type: "spring", stiffness: 300, damping: 35 }}
-            className="fixed inset-0 z-[55] flex flex-col pt-24 px-8 pb-10 md:hidden"
-            style={{ backgroundColor: "var(--bg-color)" }}
-          >
-            <nav className="flex flex-col gap-5 items-start mt-4">
-              {navLinks.map(({ label, id }, i) => (
-                <motion.button
-                  key={id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.07 + 0.1, ease: [0.16, 1, 0.3, 1], duration: 0.4 }}
-                  onClick={() => scrollTo(id)}
-                  className="text-5xl font-black tracking-tight leading-none"
-                  style={{ color: "var(--main-color)", fontFamily: "Outfit" }}
-                >
-                  {label}
-                </motion.button>
-              ))}
-            </nav>
-
-            <div
-              className="mt-auto pt-6 border-t flex flex-col gap-3"
-              style={{ borderColor: "rgba(43, 31, 45, 0.1)" }}
-            >
-              <p className="text-xs font-semibold" style={{ color: "rgba(43, 31, 45, 0.5)" }}>
-                Listo para pedir?
-              </p>
-              <a
-                href={`https://wa.me/${shopConfig.whatsappNumber}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary !justify-center"
-                style={{ backgroundColor: "#25D366", color: "#fff" }}
-              >
-                Pedir por WhatsApp
-              </a>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Mobile menu removed per request */}
     </>
   );
 }

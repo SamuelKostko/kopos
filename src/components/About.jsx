@@ -1,16 +1,27 @@
 /**
  * About.jsx — Sobre Nosotros
- * Full-width horizontal strip layout instead of 3 equal cards.
- * Split: image left half, headline + horizontal stat strip right half.
+ * Full-width layout with premium Bento highlights.
  */
 import { motion, useReducedMotion } from "motion/react";
 import { Leaf, Star, Clock } from "@phosphor-icons/react";
 import logo3 from "../assets/images/3.PNG";
 
 const highlights = [
-  { icon: Leaf,  label: "100% natural",   desc: "Sin aditivos artificiales." },
-  { icon: Star,  label: "Recetas propias", desc: "Sabores nuestros, de cero." },
-  { icon: Clock, label: "Hecho hoy",       desc: "Producción diaria, pequeña." },
+  {
+    icon: Leaf,
+    label: "100% Natural",
+    desc: "Elaborado exclusivamente con frutas de verdad y materia prima seleccionada. Sin conservantes, saborizantes artificiales ni atajos industriales."
+  },
+  {
+    icon: Star,
+    label: "Recetas Propias",
+    desc: "Creamos cada fórmula desde cero en nuestro taller. Logramos una textura cremosa incomparable y un equilibrio perfecto de sabor."
+  },
+  {
+    icon: Clock,
+    label: "Hecho Hoy",
+    desc: "Producido diariamente en lotes pequeños. Garantizamos frescura absoluta y la consistencia ideal en cada tarrina o barquilla."
+  }
 ];
 
 export function About() {
@@ -65,45 +76,44 @@ export function About() {
               className="text-base leading-relaxed font-medium max-w-[48ch]"
               style={{ color: "rgba(43, 31, 45, 0.65)" }}
             >
-              Desde nuestro primer dia, apostamos por ingredientes reales, frutas frescas de temporada y mucho amor. Sin atajos industriales.
+              Desde nuestro primer día, apostamos por ingredientes reales, frutas frescas de temporada y dedicación artesanal en cada paso. Sin atajos.
             </p>
+            <br />
           </motion.div>
         </div>
 
-        {/* Horizontal stat strip — 3 items separated by dividers, full-width */}
-        <div
-          className="grid grid-cols-1 md:grid-cols-3 rounded-2xl overflow-hidden"
-          style={{
-            border: "1px solid rgba(43, 31, 45, 0.08)",
-            backgroundColor: "rgba(255,255,255,0.45)",
-          }}
-        >
+        {/* Cute highlights grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {highlights.map(({ icon: Icon, label, desc }, i) => (
             <motion.div
               key={label}
               initial={reduce ? false : { opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.4 }}
-              transition={{ type: "spring", stiffness: 100, damping: 20, delay: i * 0.1 }}
-              className="flex items-center gap-5 p-7 md:p-8"
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ type: "spring", stiffness: 90, damping: 15, delay: i * 0.08 }}
+              whileHover={reduce ? {} : { scale: 1.03, y: -4 }}
+              className="flex flex-col gap-5 p-8 rounded-[24px] text-center items-center transition-shadow duration-300 hover:shadow-lg"
               style={{
-                borderRight: i < 2 ? "1px solid rgba(43, 31, 45, 0.07)" : undefined,
-                borderTop: undefined,
+                backgroundColor: "#ffffff",
+                border: "2px solid rgba(43, 31, 45, 0.05)",
+                boxShadow: "0 8px 20px rgba(43, 31, 45, 0.03)"
               }}
             >
+              {/* Bubbly icon badge */}
               <div
-                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: "var(--main-color)", color: "var(--bg-color)" }}
+                className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: "rgba(43, 31, 45, 0.05)", color: "var(--main-color)" }}
               >
-                <Icon size={20} weight="fill" />
+                <Icon size={26} weight="fill" />
               </div>
-              <div>
-                <p className="text-base font-black leading-tight mb-1" style={{ color: "var(--main-color)", fontFamily: "Outfit" }}>
+              <div className="flex flex-col gap-2">
+                <h3 className="text-lg font-black leading-none" style={{ color: "var(--main-color)", fontFamily: "Outfit" }}>
                   {label}
-                </p>
-                <p className="text-xs font-medium leading-snug" style={{ color: "rgba(43, 31, 45, 0.55)" }}>
+                </h3>
+                <p className="text-xs font-semibold leading-relaxed" style={{ color: "rgba(43, 31, 45, 0.55)" }}>
                   {desc}
                 </p>
+                <br />
               </div>
             </motion.div>
           ))}
@@ -113,3 +123,4 @@ export function About() {
     </section>
   );
 }
+

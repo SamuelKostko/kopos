@@ -6,7 +6,7 @@
  */
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
-import { X, IceCream } from "@phosphor-icons/react";
+import { X, IceCream, Plus } from "@phosphor-icons/react";
 import { PRESENTATIONS, presentationLabel } from "../utils/presentations";
 
 const PRESENTATION_ICONS = {
@@ -79,12 +79,12 @@ export function PresentationModal({ product, isOpen, onClose, onAdd, cartItems }
             transition={{ type: "spring", stiffness: 320, damping: 30 }}
           >
             <div
-              className="relative w-full sm:max-w-md rounded-t-[2rem] sm:rounded-[2rem] overflow-hidden shadow-2xl"
+              className="relative w-full sm:max-w-md rounded-t-[24px] sm:rounded-[24px] overflow-hidden shadow-2xl"
               style={{ backgroundColor: "var(--bg-color)", border: "1px solid rgba(43,31,45,0.08)" }}
             >
               {/* Header */}
               <div
-                className="flex items-center gap-4 p-7 pb-6 border-b"
+                className="flex items-center gap-5 p-8 sm:p-10 pb-6 border-b"
                 style={{ borderColor: "rgba(43,31,45,0.08)" }}
               >
                 <img
@@ -114,87 +114,91 @@ export function PresentationModal({ product, isOpen, onClose, onAdd, cartItems }
               </div>
 
               {/* Presentation options */}
-              <div className="p-6 sm:p-7 flex flex-col gap-4">
+              <div className="p-8 sm:p-10 flex flex-col gap-5">
                 {PRESENTATIONS.map((pres, i) => {
                   const price = product.prices[pres.priceKey];
                   const qty = getQtyInCart(pres.key);
                   const isFirst = i === 0;
 
                   return (
-                    <div
+                    <button
                       key={pres.key}
-                      className="flex items-center gap-4 p-5 sm:p-6 rounded-2xl transition-all"
+                      ref={isFirst ? firstBtnRef : undefined}
+                      onClick={() => handleAdd(pres)}
+                      aria-label={`Añadir ${pres.label} de ${product.name}`}
+                      className="relative flex items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl transition-all w-full text-left group focus-visible:outline-none"
                       style={{
                         backgroundColor: "rgba(255,255,255,0.7)",
                         border: "1px solid rgba(43,31,45,0.06)",
+                        boxShadow: "0 2px 10px rgba(43,31,45,0.02)",
                       }}
                     >
+                      {/* Fondo hover sutil */}
+                      <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
+
                       {/* Icon + labels */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <span className="text-lg" aria-hidden="true">
+                      <div className="relative z-10 flex-1 min-w-0 pr-4">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="text-2xl" aria-hidden="true">
                             {PRESENTATION_ICONS[pres.key]}
                           </span>
                           <span
-                            className="text-sm font-black"
+                            className="text-base sm:text-lg font-black"
                             style={{ color: "var(--main-color)", fontFamily: "Outfit" }}
                           >
                             {pres.label}
                           </span>
+                        </div>
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <p className="text-xs font-semibold" style={{ color: "rgba(43,31,45,0.65)" }}>
+                            {pres.sublabel}
+                          </p>
                           {PRESENTATION_SIZE_TAG[pres.key] && (
                             <span
                               className="text-[9px] font-bold uppercase tracking-[0.12em] px-2 py-0.5 rounded-full"
                               style={{
-                                backgroundColor: "rgba(43,31,45,0.07)",
-                                color: "rgba(43,31,45,0.6)",
+                                backgroundColor: "rgba(43,31,45,0.06)",
+                                color: "rgba(43,31,45,0.55)",
                               }}
                             >
                               {PRESENTATION_SIZE_TAG[pres.key]}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs" style={{ color: "rgba(43,31,45,0.5)" }}>
-                          {pres.sublabel}
-                        </p>
                       </div>
 
-                      {/* Price + add/counter */}
-                      <div className="flex items-center gap-3 flex-shrink-0">
+                      {/* Price & Action */}
+                      <div className="relative z-10 flex flex-col items-end gap-3 flex-shrink-0">
                         <span
-                          className="text-base font-black"
+                          className="text-xl sm:text-2xl font-black leading-none"
                           style={{ color: "var(--main-color)", fontFamily: "Outfit" }}
                         >
                           ${price.toFixed(2)}
                         </span>
-
-                        <button
-                          ref={isFirst ? firstBtnRef : undefined}
-                          onClick={() => handleAdd(pres)}
-                          aria-label={`Anadir ${pres.label} de ${product.name}`}
-                          className="btn-card relative"
-                        >
-                          {qty > 0 ? (
-                            <span className="flex items-center gap-1">
-                              <span
-                                className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full text-[8px] font-black flex items-center justify-center text-white"
-                                style={{ backgroundColor: "var(--whatsapp)" }}
-                              >
-                                {qty}
-                              </span>
-                              + Mas
+                        
+                        {qty > 0 ? (
+                          <span className="text-[11px] font-bold flex items-center gap-2" style={{ color: "var(--main-color)" }}>
+                            en el pedido
+                            <span 
+                              className="w-[20px] h-[20px] rounded-full text-white flex items-center justify-center text-[10px]" 
+                              style={{ backgroundColor: "var(--whatsapp)" }}
+                            >
+                              {qty}
                             </span>
-                          ) : (
-                            "Anadir"
-                          )}
-                        </button>
+                          </span>
+                        ) : (
+                          <span className="text-[11px] font-bold uppercase tracking-[0.1em] opacity-40 group-hover:opacity-100 transition-opacity flex items-center gap-1.5" style={{ color: "var(--main-color)" }}>
+                            Añadir <Plus size={12} weight="bold" />
+                          </span>
+                        )}
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
 
               {/* Footer hint */}
-              <div className="px-6 pb-8 pt-2">
+              <div className="px-8 sm:px-10 pb-10 pt-2">
                 <p className="text-center text-[11px] font-medium" style={{ color: "rgba(43,31,45,0.4)" }}>
                   Puedes anadir varias presentaciones del mismo sabor
                 </p>

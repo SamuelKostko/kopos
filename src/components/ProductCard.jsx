@@ -30,7 +30,7 @@ export function ProductCard({ product, onOpenModal, cartItems, index }) {
       whileHover={reduce ? {} : { y: -5, transition: { duration: 0.22, ease: "easeOut" } }}
       viewport={{ once: true, amount: 0.1 }}
       transition={{ type: "spring", stiffness: 100, damping: 22, delay: index * 0.04 }}
-      className="group flex flex-col overflow-hidden rounded-2xl"
+      className="group flex flex-col overflow-hidden rounded-[24px]"
       style={{
         backgroundColor: "#ffffff",
         boxShadow: "0 2px 12px rgba(43, 31, 45, 0.06)",

@@ -55,17 +55,16 @@ export function FloatingCartBar({ items, totalItems, totalPrice, onOpenCart }) {
             </div>
           </button>
 
-          {/* Botón WhatsApp de checkout rápido */}
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary !py-3.5 !px-6 !bg-[#25D366] hover:!bg-[#1EBD5A] !text-white !border-none !shadow-md hover:!shadow-lg !text-sm"
+          {/* Botón para abrir el carrito */}
+          <button
+            onClick={onOpenCart}
+            className="btn-primary !py-3.5 !px-6 !text-[var(--main-color)] !bg-[var(--bg-color)] hover:!bg-white !border-none !shadow-md hover:!shadow-lg !text-sm cursor-pointer"
+            style={{ color: "var(--main-color)" }}
           >
-            <WhatsappLogo size={22} weight="fill" />
+            <ShoppingCart size={18} weight="bold" />
             <span className="hidden sm:inline">Finalizar compra</span>
             <span className="sm:hidden font-black">Pedir</span>
-          </a>
+          </button>
         </div>
       </motion.div>
     </AnimatePresence>
