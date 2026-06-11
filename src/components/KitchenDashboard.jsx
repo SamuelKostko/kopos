@@ -1,13 +1,14 @@
 /**
  * KitchenDashboard.jsx — Panel de Recepción de Pedidos
- * Tablero Kanban en tiempo real para gestionar pedidos.
+ * Tablero Kanban en tiempo real para gestionar pedidos y visualizar el Histórico.
  */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Check, ChefHat, BellRinging, Trash, Archive, Clock, CookingPot, CheckCircle } from "@phosphor-icons/react";
+import { X, Check, ChefHat, BellRinging, Trash, Archive, Clock, CookingPot, CheckCircle, ClockCounterClockwise } from "@phosphor-icons/react";
 
 export function KitchenDashboard({ isOpen, onClose, orders, onUpdateStatus, onDeleteOrder, isFullScreen }) {
   const previousOrdersCount = useRef(orders.length);
+  const [showHistory, setShowHistory] = useState(false);
 
   // Play a chime sound when a new order is received
   useEffect(() => {
@@ -52,93 +53,171 @@ export function KitchenDashboard({ isOpen, onClose, orders, onUpdateStatus, onDe
   // Grouping orders for Kanban
   const pendingOrders = orders.filter(o => o.status === "Pendiente");
   const preparingOrders = orders.filter(o => o.status === "Preparando");
-  const readyOrders = orders.filter(o => o.status === "Entregado"); // "Entregado" means ready to deliver or delivered. We can treat it as "Listo"
+  const readyOrders = orders.filter(o => o.status === "Entregado"); 
+  const archivedOrders = orders.filter(o => o.status === "Archivado"); // NEW
 
   // Reusable Order Card Component
-  const OrderCard = ({ order, isSidebar = false }) => (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 10, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-      className={`bg-white rounded-[20px] p-5 flex flex-col gap-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-slate-100 ${isSidebar ? 'border-l-4' : ''}`}
-      style={isSidebar ? {
-        borderLeftColor: 
-          order.status === "Pendiente" ? "#e2e8f0" :
-          order.status === "Preparando" ? "#f59e0b" :
-          "#10b981"
-      } : {}}
-    >
-      <div className="flex justify-between items-start">
-        <div>
-          <span className="text-[10px] font-bold text-slate-400 font-mono tracking-widest">
-            #{order.id?.substring(0, 6).toUpperCase() || order.timestamp}
-          </span>
-          <h4 className="text-lg font-bold text-slate-800 leading-tight mt-0.5" style={{ fontFamily: "Outfit" }}>
-            {order.customer}
-          </h4>
-        </div>
-        <div className="bg-slate-50 text-slate-500 text-xs font-bold px-2.5 py-1 rounded-md">
-          Mesa {order.table || "—"}
-        </div>
-      </div>
-
-      <div className="bg-slate-50/50 rounded-xl p-3 space-y-2.5">
-        {order.items.map((it, idx) => (
-          <div key={idx} className="flex justify-between items-start text-[13px] text-slate-700">
-            <span className="font-medium leading-snug">
-              <span className="font-bold text-slate-900">{it.qty}x</span> {it.name}
-              <span className="block text-[11px] text-slate-400 mt-0.5">{it.presentationLabel}</span>
-            </span>
-            <span className="font-medium text-slate-500 whitespace-nowrap ml-2">
-              ${(it.price * it.qty).toFixed(2)}
-            </span>
+  const OrderCard = ({ order, isSidebar = false, isHistory = false }) => {
+    const dateStr = order.createdAt ? new Date(order.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "";
+    
+    return (
+      <motion.div
+        layout
+        initial={{ opacity: 0, y: 10, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+        className={`bg-white rounded-[20px] p-5 flex flex-col gap-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-slate-100 ${isSidebar ? 'border-l-4' : ''}`}
+        style={isSidebar ? {
+          borderLeftColor: 
+            order.status === "Pendiente" ? "#e2e8f0" :
+            order.status === "Preparando" ? "#f59e0b" :
+            order.status === "Entregado" ? "#10b981" : "#94a3b8"
+        } : {}}
+      >
+        <div className="flex justify-between items-start">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold text-slate-400 font-mono tracking-widest">
+                #{order.id?.substring(0, 6).toUpperCase() || order.timestamp}
+              </span>
+              {isHistory && (
+                <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                  {dateStr} {order.timestamp}
+                </span>
+              )}
+            </div>
+            <h4 className="text-lg font-bold text-slate-800 leading-tight mt-0.5" style={{ fontFamily: "Outfit" }}>
+              {order.customer}
+            </h4>
           </div>
-        ))}
-        <div className="border-t border-slate-200/60 pt-2 flex justify-between text-[13px] font-bold text-slate-800">
-          <span>Total</span>
-          <span>${order.totalPrice?.toFixed(2)}</span>
+          <div className="bg-slate-50 text-slate-500 text-xs font-bold px-2.5 py-1 rounded-md">
+            Mesa {order.table || "—"}
+          </div>
         </div>
-      </div>
 
-      <div className="flex items-center gap-2 pt-1">
-        {order.status === "Pendiente" && (
-          <button
-            onClick={() => onUpdateStatus(order.id, "Preparando")}
-            className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-95"
+        <div className="bg-slate-50/50 rounded-xl p-3 space-y-2.5">
+          {order.items.map((it, idx) => (
+            <div key={idx} className="flex justify-between items-start text-[13px] text-slate-700">
+              <span className="font-medium leading-snug">
+                <span className="font-bold text-slate-900">{it.qty}x</span> {it.name}
+                <span className="block text-[11px] text-slate-400 mt-0.5">{it.presentationLabel}</span>
+              </span>
+              <span className="font-medium text-slate-500 whitespace-nowrap ml-2">
+                ${(it.price * it.qty).toFixed(2)}
+              </span>
+            </div>
+          ))}
+          <div className="border-t border-slate-200/60 pt-2 flex justify-between text-[13px] font-bold text-slate-800">
+            <span>Total</span>
+            <span>${order.totalPrice?.toFixed(2)}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 pt-1">
+          {order.status === "Pendiente" && (
+            <button
+              onClick={() => onUpdateStatus(order.id, "Preparando")}
+              className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-95"
+            >
+              <CookingPot size={16} weight="fill" />
+              Preparar
+            </button>
+          )}
+          {order.status === "Preparando" && (
+            <button
+              onClick={() => onUpdateStatus(order.id, "Entregado")}
+              className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-95"
+            >
+              <CheckCircle size={16} weight="fill" />
+              Listo
+            </button>
+          )}
+          {order.status === "Entregado" && (
+            <button
+              onClick={() => onUpdateStatus(order.id, "Archivado")}
+              className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-95"
+            >
+              <Archive size={16} weight="bold" />
+              Archivar
+            </button>
+          )}
+          {isHistory && (
+            <button
+              onClick={() => onDeleteOrder(order.id)}
+              aria-label="Borrar pedido permanentemente"
+              className="w-10 h-10 rounded-xl bg-red-50 hover:bg-red-100 text-red-500 flex items-center justify-center transition-all active:scale-90 flex-shrink-0"
+            >
+              <Trash size={16} weight="bold" />
+            </button>
+          )}
+        </div>
+      </motion.div>
+    );
+  };
+
+  // HISTORY DRAWER (Modal)
+  const HistoryDrawer = () => (
+    <AnimatePresence>
+      {showHistory && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm"
+            onClick={() => setShowHistory(false)}
+          />
+          <motion.aside
+            initial={{ x: "100%", opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: "100%", opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed top-0 right-0 bottom-0 z-[101] w-full max-w-[450px] flex flex-col bg-slate-50 shadow-2xl overflow-hidden border-l border-slate-200"
           >
-            <CookingPot size={16} weight="fill" />
-            Preparar
-          </button>
-        )}
-        {order.status === "Preparando" && (
-          <button
-            onClick={() => onUpdateStatus(order.id, "Entregado")}
-            className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-95"
-          >
-            <CheckCircle size={16} weight="fill" />
-            Listo
-          </button>
-        )}
-        {order.status === "Entregado" && (
-          <button
-            onClick={() => onDeleteOrder(order.id)}
-            className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-95"
-          >
-            <Archive size={16} weight="bold" />
-            Archivar
-          </button>
-        )}
-        <button
-          onClick={() => onDeleteOrder(order.id)}
-          aria-label="Borrar pedido permanentemente"
-          className="w-10 h-10 rounded-xl bg-red-50 hover:bg-red-100 text-red-500 flex items-center justify-center transition-all active:scale-90 flex-shrink-0"
-        >
-          <Trash size={16} weight="bold" />
-        </button>
-      </div>
-    </motion.div>
+            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200 bg-white">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shadow-sm">
+                  <ClockCounterClockwise size={20} weight="bold" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900 tracking-tight leading-none" style={{ fontFamily: "Outfit" }}>
+                    Histórico de Ventas
+                  </h2>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">
+                    Pedidos Archivados
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowHistory(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-all active:scale-95"
+              >
+                <X size={16} weight="bold" />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              {archivedOrders.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                  <Archive size={48} weight="thin" className="text-slate-300 mb-4" />
+                  <h3 className="text-lg font-bold text-slate-800 mb-1" style={{ fontFamily: "Outfit" }}>
+                    Sin histórico
+                  </h3>
+                  <p className="text-xs font-medium text-slate-500">
+                    Aún no has archivado ningún pedido.
+                  </p>
+                </div>
+              ) : (
+                <AnimatePresence mode="popLayout">
+                  {archivedOrders.map((order) => <OrderCard key={order.id} order={order} isHistory={true} />)}
+                </AnimatePresence>
+              )}
+            </div>
+          </motion.aside>
+        </>
+      )}
+    </AnimatePresence>
   );
 
   // FULL SCREEN KANBAN VIEW
@@ -166,12 +245,21 @@ export function KitchenDashboard({ isOpen, onClose, orders, onUpdateStatus, onDe
               </div>
             </div>
           </div>
-          <button
-            onClick={() => window.location.href = "/"}
-            className="px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 text-sm font-bold hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 shadow-sm"
-          >
-            Volver al Menú
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowHistory(true)}
+              className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 text-sm font-bold hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 shadow-sm flex items-center gap-2"
+            >
+              <ClockCounterClockwise size={18} weight="bold" className="text-slate-500" />
+              Ver Histórico
+            </button>
+            <button
+              onClick={() => window.location.href = "/"}
+              className="px-5 py-2.5 rounded-xl bg-slate-800 border border-transparent text-white text-sm font-bold hover:bg-slate-900 transition-all active:scale-95 shadow-sm"
+            >
+              Volver al Menú
+            </button>
+          </div>
         </div>
 
         {/* Kanban Board */}
@@ -243,11 +331,16 @@ export function KitchenDashboard({ isOpen, onClose, orders, onUpdateStatus, onDe
 
           </div>
         </div>
+
+        {/* Render History Modal overlay if open */}
+        <HistoryDrawer />
       </div>
     );
   }
 
-  // SIDEBAR VIEW (Modal drawer)
+  // SIDEBAR VIEW (Modal drawer used in normal menu view)
+  const activeSidebarOrders = orders.filter(o => o.status !== "Archivado");
+  
   return (
     <AnimatePresence>
       {isOpen && (
@@ -282,18 +375,27 @@ export function KitchenDashboard({ isOpen, onClose, orders, onUpdateStatus, onDe
                   </p>
                 </div>
               </div>
-              <button
-                onClick={onClose}
-                aria-label="Cerrar"
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-all active:scale-95"
-              >
-                <X size={16} weight="bold" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowHistory(true)}
+                  aria-label="Ver Histórico"
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-all active:scale-95"
+                >
+                  <ClockCounterClockwise size={16} weight="bold" />
+                </button>
+                <button
+                  onClick={onClose}
+                  aria-label="Cerrar"
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-all active:scale-95"
+                >
+                  <X size={16} weight="bold" />
+                </button>
+              </div>
             </div>
 
             {/* List */}
             <div className="flex-1 overflow-y-auto p-5 space-y-4">
-              {orders.length === 0 ? (
+              {activeSidebarOrders.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center p-4">
                   <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4 border border-slate-200 text-slate-300 shadow-inner">
                     <BellRinging size={32} weight="thin" />
@@ -307,13 +409,16 @@ export function KitchenDashboard({ isOpen, onClose, orders, onUpdateStatus, onDe
                 </div>
               ) : (
                 <AnimatePresence mode="popLayout">
-                  {orders.map((order) => <OrderCard key={order.id} order={order} isSidebar={true} />)}
+                  {activeSidebarOrders.map((order) => <OrderCard key={order.id} order={order} isSidebar={true} />)}
                 </AnimatePresence>
               )}
             </div>
           </motion.aside>
         </>
       )}
+      
+      {/* Drawer can also be opened from the sidebar view */}
+      <HistoryDrawer />
     </AnimatePresence>
   );
 }
